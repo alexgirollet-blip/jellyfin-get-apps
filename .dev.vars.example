@@ -1,0 +1,5 @@
+SERVER_URL=https://jellyfin.example.com
+SERVER_NAME=My Media
+# ANNOUNCEMENT=Maintenance on Sunday 2am-4am.
+# AMAZON_DOMAIN=amazon.co.uk
+# HIDE=roku,linux

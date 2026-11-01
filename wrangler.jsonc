@@ -1,0 +1,15 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  // Rename this to match your Worker if you already have one.
+  "name": "jellyfin-get-apps",
+  "main": "src/index.js",
+  "compatibility_date": "2026-10-01",
+  "workers_dev": true,
+
+  // Set your own values in the Cloudflare dashboard
+  // (Worker → Settings → Variables and Secrets), not here.
+  // keep_vars stops a deploy from wiping them.
+  "keep_vars": true,
+
+  "observability": { "enabled": true }
+}

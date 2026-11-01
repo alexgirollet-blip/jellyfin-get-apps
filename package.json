@@ -1,0 +1,19 @@
+{
+  "name": "jellyfin-get-apps",
+  "version": "1.0.0",
+  "description": "Cloudflare Worker that gives your Jellyfin users one page to download the right app for every device.",
+  "private": true,
+  "type": "module",
+  "license": "MIT",
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy",
+    "test": "node --test"
+  },
+  "dependencies": {
+    "qrcode-generator": "^2.0.4"
+  },
+  "devDependencies": {
+    "wrangler": "^4.0.0"
+  }
+}
