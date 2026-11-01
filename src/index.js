@@ -1,5 +1,5 @@
 import qrcode from 'qrcode-generator';
-import { buildCatalogue, applyHidden, linkIndex, DESKTOP_REPO } from './clients.js';
+import { buildCatalogue, applyHidden, linkIndex, DESKTOP_REPO, GROUPS } from './clients.js';
 import { detectPlatform, PLATFORM_IDS } from './detect.js';
 import { renderPage } from './page.js';
 
@@ -128,7 +128,7 @@ export default {
       const forcedParam = (url.searchParams.get('platform') || '').toLowerCase();
       const forced = PLATFORM_IDS.includes(forcedParam);
       const platform = forced ? forcedParam : detectPlatform(request.headers.get('user-agent') || '');
-      const html = renderPage({ ...cfg, platform, forced, platforms });
+      const html = renderPage({ ...cfg, platform, forced, platforms, groups: GROUPS });
       return new Response(html, {
         headers: {
           ...securityHeaders(cfg, 'text/html; charset=utf-8'),
@@ -151,6 +151,7 @@ export default {
         platforms.map((p) => ({
           id: p.id,
           name: p.name,
+          group: p.group,
           links: p.links.map((l) => ({ id: l.id, label: l.label, url: l.url, primary: !!l.primary, short: `/go/${l.id}` })),
         })),
         cfg,

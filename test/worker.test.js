@@ -36,17 +36,24 @@ test('short links redirect', async () => {
 });
 
 test('HIDE removes platforms and links', async () => {
-  const res = await get('/api/clients', {}, { ...env, HIDE: 'roku, linux' });
+  const res = await get('/api/clients', {}, { ...env, HIDE: 'roku, linux, android-fdroid' });
   const data = await res.json();
-  assert.ok(!data.some((p) => p.id === 'linux'));
-  const tv = data.find((p) => p.id === 'tv');
-  assert.ok(!tv.links.some((l) => l.id === 'roku'));
+  assert.ok(!data.some((p) => p.id === 'linux' || p.id === 'roku'));
+  const android = data.find((p) => p.id === 'android');
+  assert.ok(!android.links.some((l) => l.id === 'android-fdroid'));
 });
 
 test('works with no config at all', async () => {
   const html = await (await get('/', {}, {})).text();
   assert.doesNotMatch(html, /id="addr"/);
   assert.doesNotMatch(html, /data-os="web"/);
+});
+
+test('every official client from jellyfin.org is listed', async () => {
+  const ids = (await (await get('/api/clients')).json()).flatMap((p) => p.links.map((l) => l.id));
+  for (const id of ['android', 'android-fdroid', 'android-amazon', 'ios', 'androidtv', 'androidtv-fdroid', 'firetv', 'roku', 'lg', 'samsung', 'xbox']) {
+    assert.ok(ids.includes(id), id);
+  }
 });
 
 test('qr code is an svg', async () => {

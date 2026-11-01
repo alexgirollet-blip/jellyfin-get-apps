@@ -18,10 +18,11 @@ function renderCard(p) {
     ? `\n      <details><summary>Install help</summary><ul>${p.help.map((h) => `<li>${h}</li>`).join('')}</ul></details>`
     : '';
   const build = p.workflow ? `\n      <p class="build" data-workflow="${esc(p.workflow)}" hidden></p>` : '';
+  const note = p.note ? `\n      <p class="note">${esc(p.note)}</p>` : '';
   return `
     <div class="card" data-os="${esc(p.id)}">
       <h2><span aria-hidden="true">${p.icon}</span> ${esc(p.name)}</h2>
-      <p>${esc(p.blurb)}</p>
+      <p>${esc(p.blurb)}</p>${note}
       <div class="btns">
         ${buttons}
       </div>${build}${help}
@@ -36,7 +37,23 @@ function renderCard(p) {
  * @param {string} o.platform detected or forced platform id
  * @param {boolean} o.forced true when ?platform= was used
  * @param {Array} o.platforms
+ * @param {Array} o.groups
  */
+function renderGroups(platforms, groups) {
+  return groups
+    .map((g) => {
+      const cards = platforms.filter((p) => p.group === g.id);
+      if (!cards.length) return '';
+      return `
+  <section class="group" data-group="${esc(g.id)}">
+    <h3>${esc(g.title)}</h3>
+    <div class="grid">${cards.map(renderCard).join('')}
+    </div>
+  </section>`;
+    })
+    .join('');
+}
+
 export function renderPage(o) {
   const server = o.serverUrl
     ? `
@@ -84,6 +101,8 @@ export function renderPage(o) {
   .card h2{margin:0 0 4px;font-size:17px}
   .card p{margin:0 0 12px;color:var(--muted);font-size:13.5px}
   .card p.build{margin:10px 0 0;font-size:12.5px}
+  .card p.note{font-size:12.5px;border-left:2px solid var(--line);padding-left:8px}
+  .card.more{margin-top:24px}
   .btns{display:flex;flex-wrap:wrap;gap:8px}
   a.btn,button.btn{display:inline-block;padding:8px 14px;border-radius:8px;font:inherit;font-size:14px;font-weight:600;text-decoration:none;cursor:pointer;border:0}
   .btn.p{background:linear-gradient(90deg,var(--a1),var(--a2));color:#fff}
@@ -110,8 +129,13 @@ export function renderPage(o) {
     <div class="grid" id="rec-grid"></div>
   </div>
 
-  <h3>All devices</h3>
-  <div class="grid" id="all">${o.platforms.map(renderCard).join('')}
+  <div id="all">${renderGroups(o.platforms, o.groups)}
+  </div>
+
+  <div class="card more">
+    <h2>Can't find your device?</h2>
+    <p>See every Jellyfin client, including Kodi and community apps, on the official site.</p>
+    <div class="btns"><a class="btn s" href="https://jellyfin.org/downloads/clients" target="_blank" rel="noopener">All clients on jellyfin.org</a></div>
   </div>
 
   <div class="card qr" id="qr" hidden style="margin-top:12px">
@@ -122,10 +146,7 @@ export function renderPage(o) {
     </div>
   </div>
 
-  <footer>
-    Desktop builds don't update themselves. Come back here for a newer version.<br>
-    Other clients: <a href="https://jellyfin.org/downloads" target="_blank" rel="noopener">jellyfin.org/downloads</a>
-  </footer>
+  <footer>Desktop builds don't update themselves. Come back here for a newer version.</footer>
 </div>
 
 <script>
@@ -139,6 +160,9 @@ export function renderPage(o) {
     card.classList.add('rec');
     document.getElementById('rec-grid').appendChild(card);
     document.getElementById('rec-slot').hidden = false;
+    document.querySelectorAll('#all .group').forEach(function (g) {
+      if (!g.querySelector('.card')) g.hidden = true;
+    });
   }
   if (os === 'windows' || os === 'mac' || os === 'linux') document.getElementById('qr').hidden = false;
 
